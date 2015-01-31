@@ -1,10 +1,15 @@
 pacakge hostsdog
 
 import (
+    "os"
+    "log"
 )
 
 func initDir() {
-
+    err = os.Mkdir("/etc/hostsdog", 0755)
+    if err != nil {
+        log.Fatal(err)
+    }
 }
 
 func generateHosts(config string) {
