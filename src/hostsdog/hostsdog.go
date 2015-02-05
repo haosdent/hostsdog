@@ -65,7 +65,7 @@ func (self *Hostsdog) ForkHosts(oldConfig string, newConfig string) {
     self.EditHosts(newConfig)
 }
 
-func (self *Hostsdog) UseHosts(config string) {
+func (self *Hostsdog) SwitchHosts(config string) {
 }
 
 func (self *Hostsdog) ListHosts() {
