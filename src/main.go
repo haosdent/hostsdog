@@ -6,6 +6,11 @@ import (
     "hostsdog"
 )
 
+const (
+    defaultConfigDir "/etc/hostsdog"
+    defaultHosts "/etc/hosts"
+)
+
 func usage() {
     fmt.Printf("Hostsdog Usage:\n")
     fmt.Printf("\tadd     [hosts]\n")
@@ -23,7 +28,7 @@ func checkArgs(requireSize int) {
 }
 
 func main() {
-    dog := hostsdog.NewHostsdog("/tmp/hostsdog", "/tmp/hosts")
+    dog := hostsdog.NewHostsdog(defaultConfigDir, defaultHosts)
     if len(os.Args) <= 1 {
         usage()
         return

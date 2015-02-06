@@ -30,7 +30,9 @@ func NewHostsdog(dir string, hosts string) *Hostsdog {
 
 func (self *Hostsdog) initDir() {
     err := os.Mkdir(self.dir, 0755)
-    if err != nil && !os.IsExist(err) {
+    if err == nil {
+        self.copy(self.hosts, self.getConfigPath(baseConfig))
+    } else if !os.IsExist(err) {
         log.Fatal(err)
     }
 }
@@ -45,6 +47,13 @@ func (self *Hostsdog) getConfigPath(config string) string {
     return fmt.Sprintf("%s/%s", self.dir, config)
 }
 
+func (self *Hostsdog) copy(src string, dst string) {
+    data, err := ioutil.ReadFile(src)
+    checkErr(err)
+    err = ioutil.WriteFile(dst, data, 0644)
+    checkErr(err)
+}
+
 func (self *Hostsdog) getHostsItems(config string) []string {
     items := make([]string, 0, 100)
     file, err := os.Open(self.getConfigPath(config))
@@ -53,12 +62,10 @@ func (self *Hostsdog) getHostsItems(config string) []string {
         reader := bufio.NewReader(file)
         for {
             line, _, err := reader.ReadLine()
-            if (len(line) > 0) {
-                items = append(items, string(line))
-            }
             if err == io.EOF {
                 break
             }
+            items = append(items, string(line))
         }
     } else if !os.IsNotExist(err) {
         checkErr(err)
@@ -113,9 +120,7 @@ func (self *Hostsdog) RmHosts(config string) {
 }
 
 func (self *Hostsdog) ForkHosts(oldConfig string, newConfig string) {
-    cmd := exec.Command("cp", "-rf", self.getConfigPath(oldConfig), self.getConfigPath(newConfig))
-    err := cmd.Run()
-    checkErr(err)
+    self.copy(self.getConfigPath(oldConfig), self.getConfigPath(newConfig))
     self.EditHosts(newConfig)
 }
 
