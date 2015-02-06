@@ -7,13 +7,14 @@ import (
 )
 
 const (
-    defaultConfigDir "/etc/hostsdog"
-    defaultHosts "/etc/hosts"
+    defaultConfigDir = "/etc/hostsdog"
+    defaultHosts = "/etc/hosts"
 )
 
 func usage() {
     fmt.Printf("Hostsdog Usage:\n")
     fmt.Printf("\tadd     [hosts]\n")
+    fmt.Printf("\tedit    [hosts]\n")
     fmt.Printf("\trm      [hosts]\n")
     fmt.Printf("\tfork    [old hosts] [new hosts]\n")
     fmt.Printf("\tswitch  [hosts]\n")
@@ -39,6 +40,10 @@ func main() {
         checkArgs(3)
         config := os.Args[2]
         dog.AddHosts(config)
+    case "edit":
+        checkArgs(3)
+        config := os.Args[2]
+        dog.EditHosts(config)
     case "rm":
         checkArgs(3)
         config := os.Args[2]

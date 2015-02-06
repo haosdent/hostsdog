@@ -11,6 +11,11 @@ func TestAddHosts(t *testing.T) {
     dog.AddHosts("new")
 }
 
+func TestEditHosts(t *testing.T) {
+    dog := hostsdog.NewHostsdog("/tmp/hostsdog", "/tmp/hosts")
+    dog.EditHosts("new")
+}
+
 func TestRmHosts(t *testing.T) {
     dog := hostsdog.NewHostsdog("/tmp/hostsdog", "/tmp/hosts")
     dog.RmHosts("new")
