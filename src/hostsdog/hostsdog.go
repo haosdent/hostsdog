@@ -101,6 +101,13 @@ func (self *Hostsdog) generateHosts(config string) {
     writer.Flush()
 }
 
+func (self *Hostsdog) CheckPermission() {
+    if os.Getuid() != 0 {
+        fmt.Printf("Run hostsdog with sudo please!\n")
+        os.Exit(-1)
+    }
+}
+
 func (self *Hostsdog) EditHosts(config string) {
     cmd := exec.Command("vim", self.getConfigPath(config))
     cmd.Stdin = os.Stdin;

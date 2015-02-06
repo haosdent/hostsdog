@@ -35,6 +35,8 @@ func main() {
         return
     }
 
+    dog.CheckPermission()
+
     switch act := os.Args[1]; act {
     case "add":
         checkArgs(3)
