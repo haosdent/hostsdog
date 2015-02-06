@@ -7,7 +7,12 @@ import (
 )
 
 func usage() {
-    fmt.Printf("hello\n")
+    fmt.Printf("Hostsdog Usage:\n")
+    fmt.Printf("\tadd     [hosts]\n")
+    fmt.Printf("\trm      [hosts]\n")
+    fmt.Printf("\tfork    [old hosts] [new hosts]\n")
+    fmt.Printf("\tswitch  [hosts]\n")
+    fmt.Printf("\tlist\n")
 }
 
 func checkArgs(requireSize int) {
