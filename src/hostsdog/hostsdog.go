@@ -3,17 +3,26 @@ package hostsdog
 import (
     "fmt"
     "os"
+    "io"
+    "bufio"
+    "io/ioutil"
     "os/exec"
     "log"
 )
 
 type Hostsdog struct {
     dir string
+    hosts string
 }
 
-func NewHostsdog(dir string) *Hostsdog {
+const (
+    baseConfig = "base"
+)
+
+func NewHostsdog(dir string, hosts string) *Hostsdog {
     var instance = &Hostsdog{
         dir,
+        hosts,
     }
     instance.initDir()
     return instance
@@ -26,12 +35,63 @@ func (self *Hostsdog) initDir() {
     }
 }
 
-func (self *Hostsdog) generateHosts(config string) {
-    //TODO
+func checkErr(err error) {
+    if err != nil {
+        log.Fatal(err)
+    }
 }
 
 func (self *Hostsdog) getConfigPath(config string) string {
     return fmt.Sprintf("%s/%s", self.dir, config)
+}
+
+func (self *Hostsdog) getHostsItems(config string) []string {
+    items := make([]string, 0, 100)
+    file, err := os.Open(self.getConfigPath(config))
+    defer file.Close()
+    if err == nil {
+        reader := bufio.NewReader(file)
+        for {
+            line, _, err := reader.ReadLine()
+            if (len(line) > 0) {
+                items = append(items, string(line))
+            }
+            if err == io.EOF {
+                break
+            }
+        }
+    } else if !os.IsNotExist(err) {
+        checkErr(err)
+    }
+
+    return items
+}
+
+func (self *Hostsdog) writeItems(writer io.Writer, items []string, config string) {
+    if (len(items) > 0) {
+        fmt.Fprintf(writer, "====== Start of %s ======\n", config)
+    }
+    for _, item := range items {
+        fmt.Fprintf(writer, "%s\n", item)
+    }
+    if (len(items) > 0) {
+        fmt.Fprintf(writer, "====== End of %s ======\n\n", config)
+    }
+}
+
+func (self *Hostsdog) generateHosts(config string) {
+    file, err := os.Create(self.hosts)
+    defer file.Close()
+    checkErr(err)
+    writer := bufio.NewWriter(file)
+
+    items := self.getHostsItems(baseConfig)
+    self.writeItems(writer, items, baseConfig)
+
+    items = self.getHostsItems(config)
+    self.writeItems(writer, items, config)
+
+    writer.Flush()
 }
 
 func (self *Hostsdog) EditHosts(config string) {
@@ -40,9 +100,7 @@ func (self *Hostsdog) EditHosts(config string) {
     cmd.Stdout = os.Stdout;
     cmd.Stderr = os.Stderr;
     err := cmd.Run()
-    if err != nil {
-        log.Fatal(err)
-    }
+    checkErr(err)
 }
 
 func (self *Hostsdog) AddHosts(config string) {
@@ -51,22 +109,26 @@ func (self *Hostsdog) AddHosts(config string) {
 
 func (self *Hostsdog) RmHosts(config string) {
     err := os.Remove(self.getConfigPath(config))
-    if err != nil {
-        log.Fatal(err)
-    }
+    checkErr(err)
 }
 
 func (self *Hostsdog) ForkHosts(oldConfig string, newConfig string) {
     cmd := exec.Command("cp", "-rf", self.getConfigPath(oldConfig), self.getConfigPath(newConfig))
     err := cmd.Run()
-    if err != nil {
-        log.Fatal(err)
-    }
+    checkErr(err)
     self.EditHosts(newConfig)
 }
 
 func (self *Hostsdog) SwitchHosts(config string) {
+    self.generateHosts(config)
 }
 
 func (self *Hostsdog) ListHosts() {
+    files, _ := ioutil.ReadDir(self.dir)
+    if (len(files) > 0) {
+        fmt.Printf("Config hosts:\n")
+    }
+    for _, file := range files {
+        fmt.Printf("\t\t%s\n", file.Name())
+    }
 }
