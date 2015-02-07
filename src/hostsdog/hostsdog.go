@@ -95,8 +95,10 @@ func (self *Hostsdog) generateHosts(config string) {
     items := self.getHostsItems(baseConfig)
     self.writeItems(writer, items, baseConfig)
 
-    items = self.getHostsItems(config)
-    self.writeItems(writer, items, config)
+    if config != baseConfig {
+        items = self.getHostsItems(config)
+        self.writeItems(writer, items, config)
+    }
 
     writer.Flush()
 }
