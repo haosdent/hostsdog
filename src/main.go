@@ -3,10 +3,11 @@ package main
 import (
     "os"
     "fmt"
+    "runtime"
     "hostsdog"
 )
 
-const (
+var (
     defaultConfigDir = "/etc/hostsdog"
     defaultHosts = "/etc/hosts"
 )
@@ -29,6 +30,11 @@ func checkArgs(requireSize int) {
 }
 
 func main() {
+    if runtime.GOOS == "windows" {
+        defaultConfigDir = "C:/Windows/System32/drivers/etc/hostsdog"
+        defaultHosts = "C:/Windows/System32/drivers/etc/hosts"
+    }
+
     dog := hostsdog.NewHostsdog(defaultConfigDir, defaultHosts)
     if len(os.Args) <= 1 {
         usage()
