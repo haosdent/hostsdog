@@ -4,7 +4,7 @@ import (
     "os"
     "fmt"
     "runtime"
-    "hostsdog"
+    "github.com/haosdent/hostsdog"
 )
 
 var (
